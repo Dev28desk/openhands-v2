@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e
 
 echo "🔧 Fixing Container Restart Issue"
@@ -12,11 +13,10 @@ section() {
 
 # Check Docker container logs
 section "Checking Docker container logs"
-docker logs deskdev-app 2>&1 | tail -n 100
+docker logs deskdev-app 2>&1 | tail -n 100 || echo "No logs found."
 
 # Stop all runtime containers
 section "Stopping all runtime containers"
-echo "Stopping all runtime containers..."
 docker ps | grep openhands-runtime | awk '{print $1}' | xargs -r docker stop
 docker ps | grep openhands-runtime | awk '{print $1}' | xargs -r docker rm
 
@@ -25,7 +25,7 @@ section "Stopping the main container"
 docker stop deskdev-app || true
 docker rm deskdev-app || true
 
-# Create a simplified docker-compose.yml with explicit entrypoint
+# Create a simplified docker-compose.yml
 section "Creating simplified docker-compose.yml"
 cd /opt/deskdev
 cat > docker-compose.yml << 'EOF'
@@ -95,6 +95,7 @@ cat > /opt/deskdev/data/settings/default_settings.json << 'EOF'
   }
 }
 EOF
+
 chmod 644 /opt/deskdev/data/settings/default_settings.json
 
 # Update Nginx configuration
@@ -120,12 +121,12 @@ server {
         alias /opt/deskdev/custom/;
     }
 
-    # Frontend application - direct access
+    # Frontend
     location = /app {
         return 301 http://31.97.61.137:3000;
     }
 
-    # Backend API
+    # API
     location /api/ {
         proxy_pass http://localhost:3001/api/;
         proxy_http_version 1.1;
@@ -133,12 +134,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 300s;
-        proxy_connect_timeout 300s;
-        proxy_send_timeout 300s;
     }
 
-    # Runtime connection
+    # Runtime
     location /runtime/ {
         proxy_pass http://localhost:30369/;
         proxy_http_version 1.1;
@@ -146,66 +144,50 @@ server {
         proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_read_timeout 300s;
-        proxy_connect_timeout 300s;
-        proxy_send_timeout 300s;
     }
 }
 EOF
 
-# Apply Nginx configuration
 ln -sf /etc/nginx/sites-available/deskdev /etc/nginx/sites-enabled/
 nginx -t && systemctl restart nginx
 
-# Ensure firewall rules allow Docker to access Ollama
+# Allow access to Ollama
 section "Configuring firewall rules"
 iptables -I INPUT -p tcp --dport 11434 -j ACCEPT
 iptables -I DOCKER -p tcp --dport 11434 -j ACCEPT 2>/dev/null || true
 
-# Pull the latest image
-section "Pulling the latest image"
+# Pull latest image
+section "Pulling latest Docker image"
 docker pull docker.all-hands.dev/all-hands-ai/openhands:latest
 
-# Start the application
-section "Starting the application"
+# Start application
+section "Starting Docker application"
 cd /opt/deskdev
 docker-compose up -d
 
-# Wait for the application to start
-echo "Waiting for the application to start..."
+# Wait and check
+echo "Waiting for app to boot..."
 sleep 15
 
-# Check if the application is running
 if docker ps | grep -q deskdev-app; then
   echo "✅ DeskDev.ai container is running"
 
-  # Check if the application is responding
-  echo "Testing application frontend..."
+  echo "Testing frontend..."
   if curl -s --max-time 5 http://localhost:3000 > /dev/null; then
-    echo "✅ Application frontend is responding"
+    echo "✅ Frontend is responding"
   else
-    echo "❌ Application frontend is not responding"
-    echo "Checking application logs:"
+    echo "❌ Frontend not responding"
     docker logs deskdev-app --tail 50
   fi
 else
-  echo "❌ DeskDev.ai container failed to start"
-  echo "Checking Docker logs:"
+  echo "❌ Container failed to start"
   docker logs deskdev-app || echo "No logs available"
 fi
 
 section "Fix complete"
 echo "✅ Container restart issue fix completed!"
 echo ""
-echo "🌐 Access your application directly:"
+echo "🌐 Access your application:"
 echo "- Frontend: http://31.97.61.137:3000"
-echo "- Landing page: http://31.97.61.137/"
+echo "- Landing:  http://31.97.61.137/"
 echo ""
-echo "The following changes have been made:"
-echo "1. Simplified docker-compose.yml with direct entrypoint"
-echo "2. Created default settings file outside the container"
-echo "3. Stopped all runtime containers that might be causing conflicts"
-echo "4. Updated Nginx to redirect /app to the direct application URL"
-echo ""
-echo "If the application is still restarting, check the logs with:"
-echo "  docker logs deskdev-app"
