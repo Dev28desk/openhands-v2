@@ -1,4 +1,3 @@
-#!/bin/bash
 set -e
 
 echo "🔧 Fixing Container Restart Issue"
