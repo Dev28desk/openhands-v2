@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 
 export const useDeleteConversation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (variables: { conversationId: string }) =>
-      OpenHands.deleteUserConversation(variables.conversationId),
+      DeskDev.ai.deleteUserConversation(variables.conversationId),
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: ["user", "conversations"] });
       const previousConversations = queryClient.getQueryData([

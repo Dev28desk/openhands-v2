@@ -1,8 +1,8 @@
-import { OpenHandsObservation } from "#/types/core/observations";
+import { DeskDev.aiObservation } from "#/types/core/observations";
 
 export type ObservationResultStatus = "success" | "error" | "timeout";
 
-export const getObservationResult = (event: OpenHandsObservation) => {
+export const getObservationResult = (event: DeskDev.aiObservation) => {
   const hasContent = event.content.length > 0;
   const contentIncludesError = event.content.toLowerCase().includes("error:");
 

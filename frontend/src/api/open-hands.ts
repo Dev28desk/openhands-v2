@@ -19,7 +19,7 @@ import { ApiSettings, PostApiSettings, Provider } from "#/types/settings";
 import { GitUser, GitRepository, Branch } from "#/types/git";
 import { SuggestedTask } from "#/components/features/home/tasks/task.types";
 
-class OpenHands {
+class DeskDev.ai {
   private static currentConversation: Conversation | null = null;
 
   /**
@@ -481,4 +481,4 @@ class OpenHands {
   }
 }
 
-export default OpenHands;
+export default DeskDev.ai;

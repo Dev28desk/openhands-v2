@@ -7,7 +7,7 @@ import {
   BrowseInteractiveAction,
   MCPAction,
   ThinkAction,
-  OpenHandsAction,
+  DeskDev.aiAction,
   FinishAction,
 } from "#/types/core/actions";
 import { getDefaultEventContent, MAX_CONTENT_LENGTH } from "./shared";
@@ -98,7 +98,7 @@ const getFinishActionContent = (event: FinishAction): string => {
 
 const getNoContentActionContent = (): string => "";
 
-export const getActionContent = (event: OpenHandsAction): string => {
+export const getActionContent = (event: DeskDev.aiAction): string => {
   switch (event.action) {
     case "read":
     case "edit":

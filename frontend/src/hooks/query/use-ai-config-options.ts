@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 
 const fetchAiConfigOptions = async () => ({
-  models: await OpenHands.getModels(),
-  agents: await OpenHands.getAgents(),
-  securityAnalyzers: await OpenHands.getSecurityAnalyzers(),
+  models: await DeskDev.ai.getModels(),
+  agents: await DeskDev.ai.getAgents(),
+  securityAnalyzers: await DeskDev.ai.getSecurityAnalyzers(),
 });
 
 export const useAIConfigOptions = () =>

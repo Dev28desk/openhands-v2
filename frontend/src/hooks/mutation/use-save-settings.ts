@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
 import { DEFAULT_SETTINGS } from "#/services/settings";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 import { PostSettings, PostApiSettings } from "#/types/settings";
 import { useSettings } from "../query/use-settings";
 
@@ -29,7 +29,7 @@ const saveSettingsMutationFn = async (settings: Partial<PostSettings>) => {
     max_budget_per_task: settings.MAX_BUDGET_PER_TASK,
   };
 
-  await OpenHands.saveSettings(apiSettings);
+  await DeskDev.ai.saveSettings(apiSettings);
 };
 
 export const useSaveSettings = () => {

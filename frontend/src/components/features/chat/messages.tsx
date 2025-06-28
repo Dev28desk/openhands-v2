@@ -1,13 +1,13 @@
 import React from "react";
-import { OpenHandsAction } from "#/types/core/actions";
-import { OpenHandsObservation } from "#/types/core/observations";
-import { isOpenHandsAction, isOpenHandsObservation } from "#/types/core/guards";
+import { DeskDev.aiAction } from "#/types/core/actions";
+import { DeskDev.aiObservation } from "#/types/core/observations";
+import { isDeskDev.aiAction, isDeskDev.aiObservation } from "#/types/core/guards";
 import { EventMessage } from "./event-message";
 import { ChatMessage } from "./chat-message";
 import { useOptimisticUserMessage } from "#/hooks/use-optimistic-user-message";
 
 interface MessagesProps {
-  messages: (OpenHandsAction | OpenHandsObservation)[];
+  messages: (DeskDev.aiAction | DeskDev.aiObservation)[];
   isAwaitingUserConfirmation: boolean;
 }
 
@@ -18,10 +18,10 @@ export const Messages: React.FC<MessagesProps> = React.memo(
     const optimisticUserMessage = getOptimisticUserMessage();
 
     const actionHasObservationPair = React.useCallback(
-      (event: OpenHandsAction | OpenHandsObservation): boolean => {
-        if (isOpenHandsAction(event)) {
+      (event: DeskDev.aiAction | DeskDev.aiObservation): boolean => {
+        if (isDeskDev.aiAction(event)) {
           return !!messages.some(
-            (msg) => isOpenHandsObservation(msg) && msg.cause === event.id,
+            (msg) => isDeskDev.aiObservation(msg) && msg.cause === event.id,
           );
         }
 

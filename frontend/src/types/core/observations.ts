@@ -1,8 +1,8 @@
 import { AgentState } from "../agent-state";
-import { OpenHandsObservationEvent } from "./base";
+import { DeskDev.aiObservationEvent } from "./base";
 
 export interface AgentStateChangeObservation
-  extends OpenHandsObservationEvent<"agent_state_changed"> {
+  extends DeskDev.aiObservationEvent<"agent_state_changed"> {
   source: "agent";
   extras: {
     agent_state: AgentState;
@@ -10,7 +10,7 @@ export interface AgentStateChangeObservation
   };
 }
 
-export interface CommandObservation extends OpenHandsObservationEvent<"run"> {
+export interface CommandObservation extends DeskDev.aiObservationEvent<"run"> {
   source: "agent" | "user";
   extras: {
     command: string;
@@ -20,7 +20,7 @@ export interface CommandObservation extends OpenHandsObservationEvent<"run"> {
 }
 
 export interface IPythonObservation
-  extends OpenHandsObservationEvent<"run_ipython"> {
+  extends DeskDev.aiObservationEvent<"run_ipython"> {
   source: "agent";
   extras: {
     code: string;
@@ -29,14 +29,14 @@ export interface IPythonObservation
 }
 
 export interface DelegateObservation
-  extends OpenHandsObservationEvent<"delegate"> {
+  extends DeskDev.aiObservationEvent<"delegate"> {
   source: "agent";
   extras: {
     outputs: Record<string, unknown>;
   };
 }
 
-export interface BrowseObservation extends OpenHandsObservationEvent<"browse"> {
+export interface BrowseObservation extends DeskDev.aiObservationEvent<"browse"> {
   source: "agent";
   extras: {
     url: string;
@@ -54,7 +54,7 @@ export interface BrowseObservation extends OpenHandsObservationEvent<"browse"> {
 }
 
 export interface BrowseInteractiveObservation
-  extends OpenHandsObservationEvent<"browse_interactive"> {
+  extends DeskDev.aiObservationEvent<"browse_interactive"> {
   source: "agent";
   extras: {
     url: string;
@@ -71,7 +71,7 @@ export interface BrowseInteractiveObservation
   };
 }
 
-export interface WriteObservation extends OpenHandsObservationEvent<"write"> {
+export interface WriteObservation extends DeskDev.aiObservationEvent<"write"> {
   source: "agent";
   extras: {
     path: string;
@@ -79,7 +79,7 @@ export interface WriteObservation extends OpenHandsObservationEvent<"write"> {
   };
 }
 
-export interface ReadObservation extends OpenHandsObservationEvent<"read"> {
+export interface ReadObservation extends DeskDev.aiObservationEvent<"read"> {
   source: "agent";
   extras: {
     path: string;
@@ -87,7 +87,7 @@ export interface ReadObservation extends OpenHandsObservationEvent<"read"> {
   };
 }
 
-export interface EditObservation extends OpenHandsObservationEvent<"edit"> {
+export interface EditObservation extends DeskDev.aiObservationEvent<"edit"> {
   source: "agent";
   extras: {
     path: string;
@@ -96,7 +96,7 @@ export interface EditObservation extends OpenHandsObservationEvent<"edit"> {
   };
 }
 
-export interface ErrorObservation extends OpenHandsObservationEvent<"error"> {
+export interface ErrorObservation extends DeskDev.aiObservationEvent<"error"> {
   source: "user";
   extras: {
     error_id?: string;
@@ -104,7 +104,7 @@ export interface ErrorObservation extends OpenHandsObservationEvent<"error"> {
 }
 
 export interface AgentThinkObservation
-  extends OpenHandsObservationEvent<"think"> {
+  extends DeskDev.aiObservationEvent<"think"> {
   source: "agent";
   extras: {
     thought: string;
@@ -117,7 +117,7 @@ export interface MicroagentKnowledge {
   content: string;
 }
 
-export interface RecallObservation extends OpenHandsObservationEvent<"recall"> {
+export interface RecallObservation extends DeskDev.aiObservationEvent<"recall"> {
   source: "agent";
   extras: {
     recall_type?: "workspace_context" | "knowledge";
@@ -132,7 +132,7 @@ export interface RecallObservation extends OpenHandsObservationEvent<"recall"> {
   };
 }
 
-export interface MCPObservation extends OpenHandsObservationEvent<"mcp"> {
+export interface MCPObservation extends DeskDev.aiObservationEvent<"mcp"> {
   source: "agent";
   extras: {
     name: string;
@@ -141,12 +141,12 @@ export interface MCPObservation extends OpenHandsObservationEvent<"mcp"> {
 }
 
 export interface UserRejectedObservation
-  extends OpenHandsObservationEvent<"user_rejected"> {
+  extends DeskDev.aiObservationEvent<"user_rejected"> {
   source: "agent";
   extras: Record<string, unknown>;
 }
 
-export type OpenHandsObservation =
+export type DeskDev.aiObservation =
   | AgentStateChangeObservation
   | AgentThinkObservation
   | CommandObservation

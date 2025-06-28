@@ -1,4 +1,4 @@
-export type OpenHandsEventType =
+export type DeskDev.aiEventType =
   | "message"
   | "system"
   | "agent_state_changed"
@@ -20,23 +20,23 @@ export type OpenHandsEventType =
   | "call_tool_mcp"
   | "user_rejected";
 
-export type OpenHandsSourceType = "agent" | "user" | "environment";
+export type DeskDev.aiSourceType = "agent" | "user" | "environment";
 
-interface OpenHandsBaseEvent {
+interface DeskDev.aiBaseEvent {
   id: number;
-  source: OpenHandsSourceType;
+  source: DeskDev.aiSourceType;
   message: string;
   timestamp: string; // ISO 8601
 }
 
-export interface OpenHandsActionEvent<T extends OpenHandsEventType>
-  extends OpenHandsBaseEvent {
+export interface DeskDev.aiActionEvent<T extends DeskDev.aiEventType>
+  extends DeskDev.aiBaseEvent {
   action: T;
   args: Record<string, unknown>;
 }
 
-export interface OpenHandsObservationEvent<T extends OpenHandsEventType>
-  extends OpenHandsBaseEvent {
+export interface DeskDev.aiObservationEvent<T extends DeskDev.aiEventType>
+  extends DeskDev.aiBaseEvent {
   cause: number;
   observation: T;
   content: string;

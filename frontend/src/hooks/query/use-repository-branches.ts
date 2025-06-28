@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 import { Branch } from "#/types/git";
 
 export const useRepositoryBranches = (repository: string | null) =>
@@ -7,7 +7,7 @@ export const useRepositoryBranches = (repository: string | null) =>
     queryKey: ["repository", repository, "branches"],
     queryFn: async () => {
       if (!repository) return [];
-      return OpenHands.getRepositoryBranches(repository);
+      return DeskDev.ai.getRepositoryBranches(repository);
     },
     enabled: !!repository,
     staleTime: 1000 * 60 * 5, // 5 minutes

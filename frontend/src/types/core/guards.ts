@@ -1,8 +1,8 @@
-import { OpenHandsParsedEvent } from ".";
+import { DeskDev.aiParsedEvent } from ".";
 import {
   UserMessageAction,
   AssistantMessageAction,
-  OpenHandsAction,
+  DeskDev.aiAction,
   SystemMessageAction,
   CommandAction,
 } from "./actions";
@@ -11,72 +11,72 @@ import {
   CommandObservation,
   ErrorObservation,
   MCPObservation,
-  OpenHandsObservation,
+  DeskDev.aiObservation,
 } from "./observations";
 import { StatusUpdate } from "./variances";
 
-export const isOpenHandsAction = (
-  event: OpenHandsParsedEvent,
-): event is OpenHandsAction => "action" in event;
+export const isDeskDev.aiAction = (
+  event: DeskDev.aiParsedEvent,
+): event is DeskDev.aiAction => "action" in event;
 
-export const isOpenHandsObservation = (
-  event: OpenHandsParsedEvent,
-): event is OpenHandsObservation => "observation" in event;
+export const isDeskDev.aiObservation = (
+  event: DeskDev.aiParsedEvent,
+): event is DeskDev.aiObservation => "observation" in event;
 
 export const isUserMessage = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is UserMessageAction =>
-  isOpenHandsAction(event) &&
+  isDeskDev.aiAction(event) &&
   event.source === "user" &&
   event.action === "message";
 
 export const isAssistantMessage = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is AssistantMessageAction =>
-  isOpenHandsAction(event) &&
+  isDeskDev.aiAction(event) &&
   event.source === "agent" &&
   (event.action === "message" || event.action === "finish");
 
 export const isErrorObservation = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is ErrorObservation =>
-  isOpenHandsObservation(event) && event.observation === "error";
+  isDeskDev.aiObservation(event) && event.observation === "error";
 
 export const isCommandAction = (
-  event: OpenHandsParsedEvent,
-): event is CommandAction => isOpenHandsAction(event) && event.action === "run";
+  event: DeskDev.aiParsedEvent,
+): event is CommandAction => isDeskDev.aiAction(event) && event.action === "run";
 
 export const isAgentStateChangeObservation = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is AgentStateChangeObservation =>
-  isOpenHandsObservation(event) && event.observation === "agent_state_changed";
+  isDeskDev.aiObservation(event) && event.observation === "agent_state_changed";
 
 export const isCommandObservation = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is CommandObservation =>
-  isOpenHandsObservation(event) && event.observation === "run";
+  isDeskDev.aiObservation(event) && event.observation === "run";
 
 export const isFinishAction = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is AssistantMessageAction =>
-  isOpenHandsAction(event) && event.action === "finish";
+  isDeskDev.aiAction(event) && event.action === "finish";
 
 export const isSystemMessage = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is SystemMessageAction =>
-  isOpenHandsAction(event) && event.action === "system";
+  isDeskDev.aiAction(event) && event.action === "system";
 
 export const isRejectObservation = (
-  event: OpenHandsParsedEvent,
-): event is OpenHandsObservation =>
-  isOpenHandsObservation(event) && event.observation === "user_rejected";
+  event: DeskDev.aiParsedEvent,
+): event is DeskDev.aiObservation =>
+  isDeskDev.aiObservation(event) && event.observation === "user_rejected";
 
 export const isMcpObservation = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is MCPObservation =>
-  isOpenHandsObservation(event) && event.observation === "mcp";
+  isDeskDev.aiObservation(event) && event.observation === "mcp";
 
 export const isStatusUpdate = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is StatusUpdate =>
   "status_update" in event && "type" in event && "id" in event;

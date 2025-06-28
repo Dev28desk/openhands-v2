@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import posthog from "posthog-js";
 import { useConfig } from "./use-config";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 import { useUserProviders } from "../use-user-providers";
 
 export const useGitUser = () => {
@@ -11,7 +11,7 @@ export const useGitUser = () => {
 
   const user = useQuery({
     queryKey: ["user"],
-    queryFn: OpenHands.getGitUser,
+    queryFn: DeskDev.ai.getGitUser,
     enabled: !!config?.APP_MODE && providers.length > 0,
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes

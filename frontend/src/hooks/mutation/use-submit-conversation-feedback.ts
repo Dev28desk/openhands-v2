@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 import { useConversationId } from "#/hooks/use-conversation-id";
 
 type SubmitConversationFeedbackArgs = {
@@ -16,7 +16,7 @@ export const useSubmitConversationFeedback = () => {
 
   return useMutation({
     mutationFn: ({ rating, eventId, reason }: SubmitConversationFeedbackArgs) =>
-      OpenHands.submitConversationFeedback(
+      DeskDev.ai.submitConversationFeedback(
         conversationId,
         rating,
         eventId,
