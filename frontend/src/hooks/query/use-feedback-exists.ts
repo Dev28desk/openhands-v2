@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 import { useConversationId } from "#/hooks/use-conversation-id";
 
 export interface FeedbackData {
@@ -15,7 +15,7 @@ export const useFeedbackExists = (eventId?: number) => {
     queryKey: ["feedback", "exists", conversationId, eventId],
     queryFn: () => {
       if (!eventId) return { exists: false };
-      return OpenHands.checkFeedbackExists(conversationId, eventId);
+      return DeskDev.ai.checkFeedbackExists(conversationId, eventId);
     },
     enabled: !!eventId,
     staleTime: 1000 * 60 * 5, // 5 minutes

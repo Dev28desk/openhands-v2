@@ -1,4 +1,4 @@
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 
 /**
  * Returns a URL compatible for the file service
@@ -6,4 +6,4 @@ import OpenHands from "#/api/open-hands";
  * @returns URL of the conversation
  */
 export const getConversationUrl = (conversationId: string) =>
-  OpenHands.getConversationUrl(conversationId);
+  DeskDev.ai.getConversationUrl(conversationId);

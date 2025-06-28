@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 import { useConversationId } from "#/hooks/use-conversation-id";
 import { GitChange } from "#/api/open-hands.types";
 import { useRuntimeIsReady } from "#/hooks/use-runtime-is-ready";
@@ -13,7 +13,7 @@ export const useGetGitChanges = () => {
 
   const result = useQuery({
     queryKey: ["file_changes", conversationId],
-    queryFn: () => OpenHands.getGitChanges(conversationId),
+    queryFn: () => DeskDev.ai.getGitChanges(conversationId),
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 15, // 15 minutes

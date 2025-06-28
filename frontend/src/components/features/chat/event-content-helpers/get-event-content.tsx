@@ -1,7 +1,7 @@
 import { Trans } from "react-i18next";
-import { OpenHandsAction } from "#/types/core/actions";
-import { isOpenHandsAction, isOpenHandsObservation } from "#/types/core/guards";
-import { OpenHandsObservation } from "#/types/core/observations";
+import { DeskDev.aiAction } from "#/types/core/actions";
+import { isDeskDev.aiAction, isDeskDev.aiObservation } from "#/types/core/guards";
+import { DeskDev.aiObservation } from "#/types/core/observations";
 import { MonoComponent } from "../mono-component";
 import { PathComponent } from "../path-component";
 import { getActionContent } from "./get-action-content";
@@ -22,12 +22,12 @@ const trimText = (text: string, maxLength: number): string => {
 };
 
 export const getEventContent = (
-  event: OpenHandsAction | OpenHandsObservation,
+  event: DeskDev.aiAction | DeskDev.aiObservation,
 ) => {
   let title: React.ReactNode = "";
   let details: string = "";
 
-  if (isOpenHandsAction(event)) {
+  if (isDeskDev.aiAction(event)) {
     const actionKey = `ACTION_MESSAGE$${event.action.toUpperCase()}`;
 
     // If translation key exists, use Trans component
@@ -55,7 +55,7 @@ export const getEventContent = (
     details = getActionContent(event);
   }
 
-  if (isOpenHandsObservation(event)) {
+  if (isDeskDev.aiObservation(event)) {
     const observationKey = `OBSERVATION_MESSAGE$${event.observation.toUpperCase()}`;
 
     // If translation key exists, use Trans component

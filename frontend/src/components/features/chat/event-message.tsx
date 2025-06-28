@@ -1,17 +1,17 @@
 import React from "react";
 import { ConfirmationButtons } from "#/components/shared/buttons/confirmation-buttons";
-import { OpenHandsAction } from "#/types/core/actions";
+import { DeskDev.aiAction } from "#/types/core/actions";
 import {
   isUserMessage,
   isErrorObservation,
   isAssistantMessage,
-  isOpenHandsAction,
-  isOpenHandsObservation,
+  isDeskDev.aiAction,
+  isDeskDev.aiObservation,
   isFinishAction,
   isRejectObservation,
   isMcpObservation,
 } from "#/types/core/guards";
-import { OpenHandsObservation } from "#/types/core/observations";
+import { DeskDev.aiObservation } from "#/types/core/observations";
 import { ImageCarousel } from "../images/image-carousel";
 import { ChatMessage } from "./chat-message";
 import { ErrorMessage } from "./error-message";
@@ -31,7 +31,7 @@ const hasThoughtProperty = (
 ): obj is { thought: string } => "thought" in obj && !!obj.thought;
 
 interface EventMessageProps {
-  event: OpenHandsAction | OpenHandsObservation;
+  event: DeskDev.aiAction | DeskDev.aiObservation;
   hasObservationPair: boolean;
   isAwaitingUserConfirmation: boolean;
   isLastMessage: boolean;
@@ -92,7 +92,7 @@ export function EventMessage({
     );
   }
 
-  if (hasObservationPair && isOpenHandsAction(event)) {
+  if (hasObservationPair && isDeskDev.aiAction(event)) {
     if (hasThoughtProperty(event.args)) {
       return <ChatMessage type="agent" message={event.args.thought} />;
     }
@@ -148,7 +148,7 @@ export function EventMessage({
 
   return (
     <div>
-      {isOpenHandsAction(event) && hasThoughtProperty(event.args) && (
+      {isDeskDev.aiAction(event) && hasThoughtProperty(event.args) && (
         <ChatMessage type="agent" message={event.args.thought} />
       )}
 
@@ -156,7 +156,7 @@ export function EventMessage({
         title={getEventContent(event).title}
         details={getEventContent(event).details}
         success={
-          isOpenHandsObservation(event)
+          isDeskDev.aiObservation(event)
             ? getObservationResult(event)
             : undefined
         }

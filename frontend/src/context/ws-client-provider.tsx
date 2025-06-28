@@ -5,24 +5,24 @@ import EventLogger from "#/utils/event-logger";
 import { handleAssistantMessage } from "#/services/actions";
 import { showChatError, trackError } from "#/utils/error-handler";
 import { useRate } from "#/hooks/use-rate";
-import { OpenHandsParsedEvent } from "#/types/core";
+import { DeskDev.aiParsedEvent } from "#/types/core";
 import {
   AssistantMessageAction,
   CommandAction,
   FileEditAction,
   FileWriteAction,
-  OpenHandsAction,
+  DeskDev.aiAction,
   UserMessageAction,
 } from "#/types/core/actions";
 import { Conversation } from "#/api/open-hands.types";
 import { useUserProviders } from "#/hooks/use-user-providers";
 import { useActiveConversation } from "#/hooks/query/use-active-conversation";
-import { OpenHandsObservation } from "#/types/core/observations";
+import { DeskDev.aiObservation } from "#/types/core/observations";
 import {
   isAgentStateChangeObservation,
   isErrorObservation,
-  isOpenHandsAction,
-  isOpenHandsObservation,
+  isDeskDev.aiAction,
+  isDeskDev.aiObservation,
   isStatusUpdate,
   isUserMessage,
 } from "#/types/core/guards";
@@ -37,7 +37,7 @@ const hasValidMessageProperty = (obj: unknown): obj is { message: string } =>
   "message" in obj &&
   typeof obj.message === "string";
 
-const isOpenHandsEvent = (event: unknown): event is OpenHandsParsedEvent =>
+const isDeskDev.aiEvent = (event: unknown): event is DeskDev.aiParsedEvent =>
   typeof event === "object" &&
   event !== null &&
   "id" in event &&
@@ -46,18 +46,18 @@ const isOpenHandsEvent = (event: unknown): event is OpenHandsParsedEvent =>
   "timestamp" in event;
 
 const isFileWriteAction = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is FileWriteAction => "action" in event && event.action === "write";
 
 const isFileEditAction = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is FileEditAction => "action" in event && event.action === "edit";
 
-const isCommandAction = (event: OpenHandsParsedEvent): event is CommandAction =>
+const isCommandAction = (event: DeskDev.aiParsedEvent): event is CommandAction =>
   "action" in event && event.action === "run";
 
 const isAssistantMessage = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is AssistantMessageAction =>
   "source" in event &&
   "type" in event &&
@@ -65,7 +65,7 @@ const isAssistantMessage = (
   event.type === "message";
 
 const isMessageAction = (
-  event: OpenHandsParsedEvent,
+  event: DeskDev.aiParsedEvent,
 ): event is UserMessageAction | AssistantMessageAction =>
   isUserMessage(event) || isAssistantMessage(event);
 
@@ -73,7 +73,7 @@ interface UseWsClient {
   webSocketStatus: WebSocketStatus;
   isLoadingMessages: boolean;
   events: Record<string, unknown>[];
-  parsedEvents: (OpenHandsAction | OpenHandsObservation)[];
+  parsedEvents: (DeskDev.aiAction | DeskDev.aiObservation)[];
   send: (event: Record<string, unknown>) => void;
 }
 
@@ -139,7 +139,7 @@ export function WsClientProvider({
     React.useState<WebSocketStatus>("DISCONNECTED");
   const [events, setEvents] = React.useState<Record<string, unknown>[]>([]);
   const [parsedEvents, setParsedEvents] = React.useState<
-    (OpenHandsAction | OpenHandsObservation)[]
+    (DeskDev.aiAction | DeskDev.aiObservation)[]
   >([]);
   const lastEventRef = React.useRef<Record<string, unknown> | null>(null);
   const { providers } = useUserProviders();
@@ -164,7 +164,7 @@ export function WsClientProvider({
   function handleMessage(event: Record<string, unknown>) {
     handleAssistantMessage(event);
 
-    if (isOpenHandsEvent(event)) {
+    if (isDeskDev.aiEvent(event)) {
       const isStatusUpdateError =
         isStatusUpdate(event) && event.type === "error";
 
@@ -187,7 +187,7 @@ export function WsClientProvider({
         return;
       }
 
-      if (isOpenHandsAction(event) || isOpenHandsObservation(event)) {
+      if (isDeskDev.aiAction(event) || isDeskDev.aiObservation(event)) {
         setParsedEvents((prevEvents) => [...prevEvents, event]);
       }
 

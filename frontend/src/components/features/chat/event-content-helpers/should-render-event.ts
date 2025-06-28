@@ -1,25 +1,25 @@
-import { OpenHandsAction } from "#/types/core/actions";
-import { OpenHandsEventType } from "#/types/core/base";
+import { DeskDev.aiAction } from "#/types/core/actions";
+import { DeskDev.aiEventType } from "#/types/core/base";
 import {
   isCommandAction,
   isCommandObservation,
-  isOpenHandsAction,
-  isOpenHandsObservation,
+  isDeskDev.aiAction,
+  isDeskDev.aiObservation,
 } from "#/types/core/guards";
-import { OpenHandsObservation } from "#/types/core/observations";
+import { DeskDev.aiObservation } from "#/types/core/observations";
 
-const COMMON_NO_RENDER_LIST: OpenHandsEventType[] = [
+const COMMON_NO_RENDER_LIST: DeskDev.aiEventType[] = [
   "system",
   "agent_state_changed",
   "change_agent_state",
 ];
 
-const ACTION_NO_RENDER_LIST: OpenHandsEventType[] = ["recall"];
+const ACTION_NO_RENDER_LIST: DeskDev.aiEventType[] = ["recall"];
 
 export const shouldRenderEvent = (
-  event: OpenHandsAction | OpenHandsObservation,
+  event: DeskDev.aiAction | DeskDev.aiObservation,
 ) => {
-  if (isOpenHandsAction(event)) {
+  if (isDeskDev.aiAction(event)) {
     if (isCommandAction(event) && event.source === "user") {
       // For user commands, we always hide them from the chat interface
       return false;
@@ -29,7 +29,7 @@ export const shouldRenderEvent = (
     return !noRenderList.includes(event.action);
   }
 
-  if (isOpenHandsObservation(event)) {
+  if (isDeskDev.aiObservation(event)) {
     if (isCommandObservation(event) && event.source === "user") {
       // For user commands, we always hide them from the chat interface
       return false;

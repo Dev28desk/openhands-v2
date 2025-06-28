@@ -34,7 +34,7 @@ import { RootState } from "#/store";
 import { displayErrorToast } from "#/utils/custom-toast-handlers";
 import { useDocumentTitleFromState } from "#/hooks/use-document-title-from-state";
 import { transformVSCodeUrl } from "#/utils/vscode-url-helper";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 import { TabContent } from "#/components/layout/tab-content";
 import { useIsAuthed } from "#/hooks/query/use-is-authed";
 import { useUserProviders } from "#/hooks/use-user-providers";
@@ -65,7 +65,7 @@ function AppContent() {
       navigate("/");
     } else if (conversation?.status === "STOPPED") {
       // start the conversation if the state is stopped on initial load
-      OpenHands.startConversation(conversation.conversation_id, providers).then(
+      DeskDev.ai.startConversation(conversation.conversation_id, providers).then(
         () => refetch(),
       );
     }
@@ -144,7 +144,7 @@ function AppContent() {
                       if (conversationId) {
                         try {
                           const data =
-                            await OpenHands.getVSCodeUrl(conversationId);
+                            await DeskDev.ai.getVSCodeUrl(conversationId);
                           if (data.vscode_url) {
                             const transformedUrl = transformVSCodeUrl(
                               data.vscode_url,

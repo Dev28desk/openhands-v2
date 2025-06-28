@@ -4,7 +4,7 @@ import {
   IPythonObservation,
   EditObservation,
   BrowseObservation,
-  OpenHandsObservation,
+  DeskDev.aiObservation,
   RecallObservation,
 } from "#/types/core/observations";
 import { getObservationResult } from "./get-observation-result";
@@ -102,7 +102,7 @@ const getRecallObservationContent = (event: RecallObservation): string => {
   return content;
 };
 
-export const getObservationContent = (event: OpenHandsObservation): string => {
+export const getObservationContent = (event: DeskDev.aiObservation): string => {
   switch (event.observation) {
     case "read":
       return getReadObservationContent(event);

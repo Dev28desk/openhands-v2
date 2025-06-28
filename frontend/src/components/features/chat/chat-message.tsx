@@ -6,11 +6,11 @@ import { cn } from "#/utils/utils";
 import { ul, ol } from "../markdown/list";
 import { CopyToClipboardButton } from "#/components/shared/buttons/copy-to-clipboard-button";
 import { anchor } from "../markdown/anchor";
-import { OpenHandsSourceType } from "#/types/core/base";
+import { DeskDev.aiSourceType } from "#/types/core/base";
 import { paragraph } from "../markdown/paragraph";
 
 interface ChatMessageProps {
-  type: OpenHandsSourceType;
+  type: DeskDev.aiSourceType;
   message: string;
 }
 

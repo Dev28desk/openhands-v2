@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import OpenHands from "#/api/open-hands";
+import DeskDev.ai from "#/api/open-hands";
 
 interface UseConversationMicroagentsOptions {
   conversationId: string | undefined;
@@ -16,7 +16,7 @@ export const useConversationMicroagents = ({
       if (!conversationId) {
         throw new Error("No conversation ID provided");
       }
-      const data = await OpenHands.getMicroagents(conversationId);
+      const data = await DeskDev.ai.getMicroagents(conversationId);
       return data.microagents;
     },
     enabled: !!conversationId && enabled,

@@ -1,8 +1,8 @@
-import { OpenHandsAction } from "./actions";
-import { OpenHandsObservation } from "./observations";
-import { OpenHandsVariance } from "./variances";
+import { DeskDev.aiAction } from "./actions";
+import { DeskDev.aiObservation } from "./observations";
+import { DeskDev.aiVariance } from "./variances";
 
-export type OpenHandsParsedEvent =
-  | OpenHandsAction
-  | OpenHandsObservation
-  | OpenHandsVariance;
+export type DeskDev.aiParsedEvent =
+  | DeskDev.aiAction
+  | DeskDev.aiObservation
+  | DeskDev.aiVariance;
