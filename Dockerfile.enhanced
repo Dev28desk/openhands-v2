@@ -1,0 +1,26 @@
+FROM ghcr.io/all-hands-ai/openhands:latest
+
+USER root
+
+# Install additional dependencies
+RUN apt-get update && apt-get install -y sed curl nodejs npm
+
+# Create custom directories
+RUN mkdir -p /app/custom/templates /app/custom/static /app/custom/auth
+
+# Copy custom files
+COPY custom/ /app/custom/
+COPY enhanced-entrypoint.sh /app/enhanced-entrypoint.sh
+COPY setup-auth.py /app/setup-auth.py
+
+# Make scripts executable
+RUN chmod +x /app/enhanced-entrypoint.sh
+RUN chmod +x /app/setup-auth.py
+RUN chmod +x /app/custom/rebrand.sh
+
+# Apply rebranding and setup
+RUN /app/custom/rebrand.sh
+
+WORKDIR /app
+ENTRYPOINT ["/app/enhanced-entrypoint.sh"]
+CMD ["uvicorn", "openhands.server.listen:app", "--host", "0.0.0.0", "--port", "3000"]
