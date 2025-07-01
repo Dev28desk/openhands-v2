@@ -4,6 +4,7 @@ set -e
 echo "🚀 Complete System Deployment Script for 154.201.127.161"
 echo "========================================================"
 echo "Installing: OpenHands + Open WebUI + Ollama + CodeLlama 70B"
+echo "Ubuntu 24.04 LTS Compatible Version"
 echo ""
 
 # Variables
@@ -29,6 +30,17 @@ print_warning() {
     echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $1"
 }
 
+# Fix broken repositories
+print_status "🔧 Fixing APT repositories..."
+sudo rm -f /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo rm -f /etc/apt/sources.list.d/nvidia-docker.list
+sudo rm -f /etc/apt/sources.list.d/nvidia*
+sudo rm -f /etc/apt/sources.list.d/cuda*
+
+# Clean APT cache
+sudo apt-get clean
+sudo rm -rf /var/lib/apt/lists/*
+
 # Clean up everything
 print_status "🧹 Cleaning up existing installations..."
 sudo systemctl stop docker ollama nginx apache2 2>/dev/null || true
@@ -42,11 +54,15 @@ sudo docker stop $(sudo docker ps -aq) 2>/dev/null || true
 sudo docker rm $(sudo docker ps -aq) 2>/dev/null || true
 sudo docker rmi $(sudo docker images -q) 2>/dev/null || true
 
-# Update system
+# Update system with fixed repositories
 print_status "📦 Updating system packages..."
-sudo apt-get update -y
+sudo apt-get update -y || {
+    print_warning "Initial update failed, cleaning sources..."
+    sudo rm -rf /var/lib/apt/lists/*
+    sudo apt-get update -y
+}
 sudo apt-get upgrade -y
-sudo apt-get install -y curl wget git nano htop net-tools ufw ca-certificates gnupg lsb-release
+sudo apt-get install -y curl wget git nano htop net-tools ufw ca-certificates gnupg lsb-release software-properties-common
 
 # Configure firewall
 print_status "🔥 Configuring firewall..."
@@ -64,28 +80,59 @@ sudo ufw allow 11434/tcp # Ollama API
 sudo ufw allow 30369/tcp # OpenHands Runtime
 sudo ufw --force enable
 
-# Install Docker
+# Install Docker (Ubuntu 24.04 specific)
 print_status "🐳 Installing Docker..."
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+# Remove any old Docker GPG keys
+sudo rm -f /usr/share/keyrings/docker-archive-keyring.gpg
+sudo rm -f /etc/apt/keyrings/docker.gpg
+
+# Add Docker's official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Update and install Docker
 sudo apt-get update -y
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo usermod -aG docker $USER
+
+# Add user to docker group
+sudo usermod -aG docker $USER || true
+
+# Start Docker
 sudo systemctl enable docker
 sudo systemctl start docker
+
+# Verify Docker installation
+if ! sudo docker run hello-world >/dev/null 2>&1; then
+    print_error "Docker installation failed!"
+    exit 1
+fi
+print_status "✅ Docker installed successfully"
 
 # Install Docker Compose
 print_status "🐳 Installing Docker Compose..."
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
+# Verify Docker Compose
+if ! docker-compose version >/dev/null 2>&1; then
+    print_error "Docker Compose installation failed!"
+    exit 1
+fi
+
 # Install Ollama
 print_status "🤖 Installing Ollama..."
 curl -fsSL https://ollama.ai/install.sh | sh
 
+# Wait for Ollama to be installed
+sleep 5
+
 # Configure Ollama
 print_status "⚙️ Configuring Ollama..."
+sudo mkdir -p /etc/systemd/system
 sudo tee /etc/systemd/system/ollama.service > /dev/null << 'EOF'
 [Unit]
 Description=Ollama Service
@@ -111,16 +158,32 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable ollama
 sudo systemctl restart ollama
-sleep 10
+
+# Wait for Ollama to start
+print_status "⏳ Waiting for Ollama to start..."
+for i in {1..30}; do
+    if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+        print_status "✅ Ollama is running"
+        break
+    fi
+    sleep 2
+done
 
 # Test Ollama
-print_status "🧪 Testing Ollama..."
-curl -s http://localhost:11434/api/tags || print_error "Ollama test failed!"
+if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+    print_error "Ollama is not responding!"
+    sudo journalctl -u ollama -n 50
+    exit 1
+fi
 
 # Pull CodeLlama 70B model
 print_status "📥 Pulling CodeLlama 70B model (this will take 30-60 minutes)..."
 print_warning "The 70B model requires ~40GB of disk space and ~70GB of RAM to run efficiently"
-ollama pull $OLLAMA_MODEL || print_error "Failed to pull model!"
+ollama pull $OLLAMA_MODEL || {
+    print_error "Failed to pull model! Trying again..."
+    sleep 10
+    ollama pull $OLLAMA_MODEL
+}
 
 # Create application directories
 print_status "📁 Creating application directories..."
@@ -128,8 +191,8 @@ sudo mkdir -p /opt/{deskdev,open-webui}/{data,config}
 sudo mkdir -p /opt/deskdev/{workspace,custom/templates,custom/static/{css,images}}
 sudo chmod -R 755 /opt
 
-# Create landing page for DeskDev
-print_status "🎨 Creating DeskDev landing page..."
+# Create landing page
+print_status "🎨 Creating landing page..."
 sudo tee /opt/deskdev/custom/templates/index.html > /dev/null << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
@@ -222,7 +285,7 @@ sudo tee /opt/deskdev/custom/templates/index.html > /dev/null << 'EOF'
         
         <div class="services">
             <div class="service-card">
-                <h2>🚀 OpenHands (DeskDev.ai)</h2>
+                <h2>🚀 OpenHands</h2>
                 <p>AI-powered software development assistant for building applications</p>
                 <a href="http://154.201.127.161:3000" class="btn">Launch OpenHands</a>
             </div>
@@ -265,7 +328,7 @@ networks:
     driver: bridge
 
 services:
-  # OpenHands (DeskDev.ai)
+  # OpenHands
   openhands:
     image: ghcr.io/all-hands-ai/openhands:latest
     container_name: openhands
@@ -288,8 +351,7 @@ services:
       - DEFAULT_LLM_MODEL=codellama:70b-code
       
       # App Configuration
-      - APP_NAME=DeskDev.ai
-      - APP_TITLE=DeskDev.ai - AI Software Engineer
+      - APP_NAME=OpenHands
       - FRONTEND_URL=http://154.201.127.161:3000
       - BACKEND_URL=http://154.201.127.161:3001
       
@@ -389,33 +451,10 @@ http {
 }
 EOF
 
-# Create systemd service for docker-compose
-print_status "🔧 Creating systemd service..."
-sudo tee /etc/systemd/system/ai-platform.service > /dev/null << 'EOF'
-[Unit]
-Description=AI Development Platform
-After=docker.service ollama.service
-Requires=docker.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=/opt
-ExecStart=/usr/local/bin/docker-compose up -d
-ExecStop=/usr/local/bin/docker-compose down
-Restart=on-failure
-RestartSec=30
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
 # Start all services
 print_status "🚀 Starting all services..."
 cd /opt
 sudo docker-compose up -d
-sudo systemctl daemon-reload
-sudo systemctl enable ai-platform.service
 
 # Wait for services to start
 print_status "⏳ Waiting for services to start..."
@@ -425,7 +464,11 @@ sleep 30
 print_status "🏥 Running health checks..."
 echo ""
 echo "Checking Ollama..."
-curl -s http://localhost:11434/api/tags | grep -q "codellama:70b-code" && echo "✅ Ollama: OK" || echo "❌ Ollama: Failed"
+if curl -s http://localhost:11434/api/tags | grep -q "codellama:70b-code"; then
+    echo "✅ Ollama: OK - CodeLlama 70B model loaded"
+else
+    echo "❌ Ollama: Model not found (may still be downloading)"
+fi
 
 echo "Checking OpenHands..."
 curl -s http://localhost:3000 > /dev/null && echo "✅ OpenHands: OK" || echo "❌ OpenHands: Failed"
